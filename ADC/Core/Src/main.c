@@ -49,7 +49,7 @@ DMA_HandleTypeDef hdma_adc1;
 TIM_HandleTypeDef htim8;
 
 /* USER CODE BEGIN PV */
-volatile uint16_t adcData[NUM_OF_CONVERSIONS];
+volatile uint16_t adcData[NUM_OF_CONVERSIONS] __attribute__((section(".nocache")));
 volatile float    sensorVoltage[NUM_OF_CONVERSIONS];
 /* USER CODE END PV */
 

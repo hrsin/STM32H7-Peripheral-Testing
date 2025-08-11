@@ -173,7 +173,13 @@ SECTIONS
     libm.a ( * )
     libgcc.a ( * )
   }
-
+  /* RAM Modifications by -- Harsh */
+  .nocache(NOLOAD) : 
+  {
+  	. = ALIGN(32);
+  	*(.nocache)
+  } > RAM_SRD
+  
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
 
