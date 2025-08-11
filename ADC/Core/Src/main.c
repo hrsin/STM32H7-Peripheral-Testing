@@ -31,7 +31,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define NUM_OF_CONVERSIONS 13
+#define ADC_RAW_VOLTAGE 0.00005035477f
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,7 +49,8 @@ DMA_HandleTypeDef hdma_adc1;
 TIM_HandleTypeDef htim8;
 
 /* USER CODE BEGIN PV */
-
+volatile uint16_t adcData[NUM_OF_CONVERSIONS];
+volatile float    sensorVoltage[NUM_OF_CONVERSIONS];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -63,7 +65,11 @@ static void MX_TIM8_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *had) {
+	for (uint8_t index = 0; index<NUM_OF_CONVERSIONS; index++) {
+		sensorVoltage[index] = ADC_RAW_VOLTAGE * (float) adcData[index];
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -72,11 +78,8 @@ static void MX_TIM8_Init(void);
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
-
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -99,7 +102,9 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED);//Calibrating ADC before enbaling conversions
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adcData, NUM_OF_CONVERSIONS);//Starting DMA based ADC
+  HAL_TIM_Base_Start(&htim8); //50Hz sampling frequency
   /* USER CODE END 2 */
 
   /* Initialize leds */
